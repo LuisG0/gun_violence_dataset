@@ -13,23 +13,26 @@ incidents = incidents.query("year != 2013")
 incidents = incidents.query("year != 2018")
 
 #incidents = incidents.query("month/year == 6/2016")
-incidents["size"] = incidents["n_injured"] +1
+scale = 1
+incidents["size"] = (incidents["n_injured"]+1) * scale 
 
 import plotly.express as px
 import plotly.graph_objects as go
 fig = px.scatter_geo(incidents, lat="latitude",lon="longitude",
                      hover_name="city, state",
                      size="size",
+                     size_max=50,
                      hover_data=["n_killed","n_injured"],
                      animation_frame="month/year",
                      projection="natural earth",
                      scope="north america",
-                     opacity = 0.6,
+                     opacity = 0.4,
                      color="n_killed",
-                     color_continuous_scale = ["#919090","#ff8aa3","#ff2655","#ff2655","#ff2655","#9e0022"],
+                     color_continuous_scale = "Turbo",#["#34eb89","#dcff33","#ff2655","#9e0022"],
+                     title = "Incidentes con armas de fuego"
                     #  color="n_killed_group",
                     #  color_discrete_sequence  =["#919090","#ff8aa3","#ff2655","#9e0022"]
                      )
-fig.update_coloraxes(cmax =7,cmin =0)
+fig.update_coloraxes(cmax =incidents["n_injured"].max(),cmin =0)
                      
 fig.show()
