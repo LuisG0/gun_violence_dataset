@@ -13,7 +13,6 @@ incidents["month"] = incidents["date"].apply(lambda date: datetime.datetime.strp
 incidents["year"] = incidents["date"].apply(lambda date: datetime.datetime.strptime(date, "%Y-%m-%d").year)
 incidents["month/year"] = incidents["month"].astype(str) + "/" + incidents["year"].astype(str)
 
-import plotly.express as px
 incidents = incidents.query("year != 2013")
 incidents = incidents.query("year != 2018")
 
@@ -40,21 +39,43 @@ incidents_map["incidents_per_1M"] = incidents_map["n_incidents"] / incidents_map
 incidents_map["injuried_per_1M"] = incidents_map["n_injured"] / incidents_map["pop"] * 1000000
 incidents_map["killed_per_1M"] = incidents_map["n_killed"] / incidents_map["pop"] * 1000000
 
-def plot_map(df, col, pal):
-    df = df[df["n_incidents"]>0]
-    fig = px.choropleth(df, locations="code", locationmode='USA-states', 
+incidents_map.to_csv("./data/incidents_dataset.csv",index=False)
+
+from dash import Dash, dcc, html, Input, Output
+import plotly.express as px
+
+app = Dash(__name__)
+
+app.layout = html.Div([
+    dcc.RadioItems(
+        id='variable', 
+        options=["incidents_per_1M", "injuried_per_1M", "killed_per_1M"],
+        value="incidents_per_1M",
+        inline=True
+    ),
+    dcc.Graph(id="graph",style={'width': '200vh', 'height': '90vh'}),
+])
+
+@app.callback(
+    Output("graph", "figure"), 
+    Input("variable", "value"))
+def plot_map(col):
+    incidents_map = pd.read_csv('data/incidents_dataset.csv')
+    incidents_map = incidents_map[incidents_map["n_incidents"]>0]
+    fig = px.choropleth(incidents_map, locations="code", locationmode='USA-states', 
                   color=col,
                   hover_name="state", 
                   hover_data=["n_injured","n_killed","n_incidents"], 
-                  color_continuous_scale=pal,
+                  color_continuous_scale="Reds",
                   animation_frame="month/year",
                   projection="natural earth",
                   scope="north america",
                   title="Número de incidentes con armas por cada millón de habitantes"
                   )
-    fig.update_coloraxes(cmax =df[col].max(),cmin =df[col].min())
-    fig.show()
+    fig.update_coloraxes(cmax =incidents_map[col].max(),cmin =incidents_map[col].min())
+
+    return fig
 
 
-plot_map(incidents_map, 'incidents_per_1M', 'Reds') #n_injured, n_killed or n_incidents
+app.run_server(debug=False)
 
