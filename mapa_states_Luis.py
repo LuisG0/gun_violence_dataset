@@ -36,8 +36,9 @@ incidents_map = incidents_map.reset_index()
 
 # Get incidents per million people
 incidents_map = incidents_map.join(population.set_index('state'),on='state')
-incidents_map["injuried_per_1M"] = incidents_map["n_incidents"] / incidents_map["pop"] * 1000000
-incidents_map
+incidents_map["incidents_per_1M"] = incidents_map["n_incidents"] / incidents_map["pop"] * 1000000
+incidents_map["injuried_per_1M"] = incidents_map["n_injured"] / incidents_map["pop"] * 1000000
+incidents_map["killed_per_1M"] = incidents_map["n_killed"] / incidents_map["pop"] * 1000000
 
 def plot_map(df, col, pal):
     df = df[df["n_incidents"]>0]
@@ -49,11 +50,11 @@ def plot_map(df, col, pal):
                   animation_frame="month/year",
                   projection="natural earth",
                   scope="north america",
-                  title="Heridos con armas por cada millón de habitantes"
+                  title="Número de incidentes con armas por cada millón de habitantes"
                   )
     fig.update_coloraxes(cmax =df[col].max(),cmin =df[col].min())
     fig.show()
 
 
-plot_map(incidents_map, 'injuried_per_1M', 'Reds') #n_injured, n_killed or n_incidents
+plot_map(incidents_map, 'incidents_per_1M', 'Reds') #n_injured, n_killed or n_incidents
 
