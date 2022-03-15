@@ -71,14 +71,14 @@ def plot_map(col):
     fig = px.choropleth(incidents_map, locations="code", locationmode='USA-states', 
                   color=col,
                   hover_name="state", 
-                  hover_data=["n_injured","n_killed","n_incidents"], 
+                  hover_data=["n_injured","n_killed","n_incidents","pop"], 
                   color_continuous_scale="Reds",
                   animation_frame="month/year",
                   projection="natural earth",
                   scope="north america",
                   title=f"Número de {name2title[col]} con armas por cada millón de habitantes"
                   )
-    fig.update_coloraxes(cmax =incidents_map[col].max(),cmin =incidents_map[col].min())
+    fig.update_coloraxes(cmax =incidents_map[col].nlargest(2).iloc[1],cmin =incidents_map[col].min())
 
     return fig
 
