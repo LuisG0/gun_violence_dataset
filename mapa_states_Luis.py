@@ -28,7 +28,7 @@ def state2code(df):
 
 incidents = state2code(incidents)
 
-incidents_per_state = incidents.groupby(["code","state","month/year"], as_index=False)
+incidents_per_state = incidents.groupby(["code","state","date","month/year"], as_index=False)
 incidents_map = incidents_per_state["n_injured"].agg(['sum','count']).rename(columns={'count':'n_incidents','sum':'n_injured'})
 incidents_map["n_killed"] = incidents_per_state["n_killed"].agg(['sum']).rename(columns={'sum':'n_killed'})["n_killed"]
 incidents_map = incidents_map.reset_index()
@@ -39,7 +39,7 @@ incidents_map["incidents_per_1M"] = incidents_map["n_incidents"] / incidents_map
 incidents_map["injuried_per_1M"] = incidents_map["n_injured"] / incidents_map["pop"] * 1000000
 incidents_map["killed_per_1M"] = incidents_map["n_killed"] / incidents_map["pop"] * 1000000
 
-incidents_map.to_csv("./data/incidents_dataset.csv",index=False)
+incidents_map.to_csv("./data/incidents_dataset_map.csv",index=False)
 
 
 
@@ -62,7 +62,7 @@ app.layout = html.Div([
     Output("graph", "figure"), 
     Input("variable", "value"))
 def plot_map(col):
-    incidents_map = pd.read_csv('data/incidents_dataset.csv')
+    incidents_map = pd.read_csv('data/incidents_dataset_map.csv')
     incidents_map = incidents_map[incidents_map["n_incidents"]>0]
     name2title = {"incidents_per_1M":"incidentes",
     "injuried_per_1M":"heridos",
