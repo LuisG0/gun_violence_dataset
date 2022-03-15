@@ -41,6 +41,8 @@ incidents_map["killed_per_1M"] = incidents_map["n_killed"] / incidents_map["pop"
 
 incidents_map.to_csv("./data/incidents_dataset.csv",index=False)
 
+
+
 from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 
@@ -62,6 +64,10 @@ app.layout = html.Div([
 def plot_map(col):
     incidents_map = pd.read_csv('data/incidents_dataset.csv')
     incidents_map = incidents_map[incidents_map["n_incidents"]>0]
+    name2title = {"incidents_per_1M":"incidentes",
+    "injuried_per_1M":"heridos",
+    "killed_per_1M":"muertes"
+    }
     fig = px.choropleth(incidents_map, locations="code", locationmode='USA-states', 
                   color=col,
                   hover_name="state", 
@@ -70,7 +76,7 @@ def plot_map(col):
                   animation_frame="month/year",
                   projection="natural earth",
                   scope="north america",
-                  title="Número de incidentes con armas por cada millón de habitantes"
+                  title=f"Número de {name2title[col]} con armas por cada millón de habitantes"
                   )
     fig.update_coloraxes(cmax =incidents_map[col].max(),cmin =incidents_map[col].min())
 
