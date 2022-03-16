@@ -1,0 +1,12 @@
+tqdm
+pandas
+numpy
+matplotlib
+seaborn
+sklearn
+plotly
+datetime
+json
+dash
+ipympl
+statsmodels
